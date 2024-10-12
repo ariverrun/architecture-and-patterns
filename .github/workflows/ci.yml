@@ -34,6 +34,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies via Composer
+        run: composer install
+
       - name: List directory files
         run: ls -l
 
