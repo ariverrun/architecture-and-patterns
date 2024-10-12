@@ -1,0 +1,38 @@
+name: Github CI Actions
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install dependencies via Composer
+        run: composer install
+
+  unit_testing:
+    runs-on: ubuntu-latest
+
+    needs:
+      - build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Unit-tests
+        run: php vendor/bin/phpunit tests    
