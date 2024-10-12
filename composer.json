@@ -2,7 +2,7 @@
     "name": "ariverrun/architecture-and-patterns",
     "autoload": {
         "psr-4": {
-            "Ariverrun\\ArchitectureAndPatterns\\": "src/"
+            "App\\": "src/"
         }
     },
     "require-dev": {
