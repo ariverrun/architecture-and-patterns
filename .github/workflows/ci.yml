@@ -34,5 +34,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: List directory files
+        run: ls -l
+
       - name: Run Unit-tests
         run: php vendor/bin/phpunit tests    
