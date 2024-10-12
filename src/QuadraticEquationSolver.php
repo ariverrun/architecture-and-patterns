@@ -8,8 +8,6 @@ use InvalidArgumentException;
 
 class QuadraticEquationSolver
 {
-    private const FLOAT_EPSILON = PHP_FLOAT_EPSILON * 10;
-
     /**
      * @return float[]
      */
@@ -52,6 +50,6 @@ class QuadraticEquationSolver
 
     private function isZero(float $val): bool
     {
-        return abs($val) <= self::FLOAT_EPSILON;
+        return abs($val) <= PHP_FLOAT_EPSILON;
     }
 }

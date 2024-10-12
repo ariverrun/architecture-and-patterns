@@ -37,7 +37,7 @@ class QuadraticEquationSolverTest extends TestCase
      */
     public static function getTestCases(): array
     {
-        return [
+        return [          
             /**
              * x^2+1 = 0 has no roots
              */
@@ -82,10 +82,10 @@ class QuadraticEquationSolverTest extends TestCase
              * Discriminant with abs value less than epsilon is considered as 0 
              */              
             [
-                'a' => 5.0,
-                'b' => 10.0,
-                'c' => 5.0 - (PHP_FLOAT_EPSILON * 2.00000000000000022200001),
-                'expected' => [-1.0],
+                'a' => 2.5E-9,
+                'b' => 1.5E-8,
+                'c' => 2.0E-9,
+                'expected' => [-2.9999999999999996],
                 'exception' => null,
             ],
             /**
