@@ -19,9 +19,4 @@ class Vector
             $vectorA->y + $vectorB->y
         );
     }
-
-    public function toInt(): int
-    {
-        return (int)($this->x / $this->y);
-    }
 }
