@@ -19,7 +19,7 @@ class CommandExceptionHandler implements CommandExceptionHandlerInterface
     {
         $resolver = $this->getResolver($command, $exception);
 
-        return $resolver->handle($command, $exception);
+        return $resolver->resolve($command, $exception);
     }
 
     public function registerResolver(string $commandClass, string $exceptionClass, CommandExceptionResolverInterface $exceptionHandler): void

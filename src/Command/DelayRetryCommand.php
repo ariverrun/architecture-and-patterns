@@ -9,8 +9,8 @@ use App\CommandQueue\CommandQueueInterface;
 class DelayRetryCommand implements CommandInterface
 {
     public function __construct(
-        private readonly CommandInterface $command,
-        private readonly CommandQueueInterface $commandQueue,
+        protected readonly CommandInterface $command,
+        protected readonly CommandQueueInterface $commandQueue,
     ) {
     }
 
