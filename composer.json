@@ -9,5 +9,8 @@
         "phpunit/phpunit": "^11.4",
         "friendsofphp/php-cs-fixer": "^3.64",
         "kubawerlos/php-cs-fixer-custom-fixers": "^3.22"
+    },
+    "require": {
+        "webmozart/assert": "^1.11"
     }
 }
