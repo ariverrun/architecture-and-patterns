@@ -11,4 +11,5 @@ interface MovingObjectInterface
     public function getLocation(): Vector;
     public function setLocation(Vector $location): void;
     public function getVelocity(): Vector;
+    public function setVelocity(Vector $velocity): void;
 }
