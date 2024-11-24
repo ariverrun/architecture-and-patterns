@@ -14,24 +14,25 @@ use Closure;
 class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSupportingDependencyResolver
 {
     private const ROOT_SCOPE_ID = '';
+
     private array $scopes = [];
     private ?string $currentScopeId = self::ROOT_SCOPE_ID;
 
     public function __construct()
     {
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Register'] = function(string $dependencyKey, Closure $dependencyBuildingClosure): Closure {
-            return function() use($dependencyKey, $dependencyBuildingClosure): void {
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Register'] = function (string $dependencyKey, Closure $dependencyBuildingClosure): Closure {
+            return function () use ($dependencyKey, $dependencyBuildingClosure): void {
                 $this->scopes[$this->currentScopeId][$dependencyKey] = $dependencyBuildingClosure;
             };
         };
 
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.SetCurrent'] = function(string $scopeId): SetCurrentScopeCommand {
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.SetCurrent'] = function (string $scopeId): SetCurrentScopeCommand {
             return new SetCurrentScopeCommand($this, $scopeId);
         };
-        
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.New'] = function(string $scopeId): CreateNewScopeCommand {
+
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.New'] = function (string $scopeId): CreateNewScopeCommand {
             return new CreateNewScopeCommand($this, $scopeId);
-        };     
+        };
     }
 
     public function resolve(string $dependencyKey, mixed ...$args): mixed
@@ -57,7 +58,7 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
         if (false === array_key_exists($scopeId, $this->scopes)) {
             throw new ScopeNotFoundException();
         }
-        
+
         $this->currentScopeId = $scopeId;
     }
 
@@ -67,5 +68,5 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
             throw new ScopeAlreadyExistsException();
         }
         $this->scopes[$scopeId] = [];
-    }        
+    }
 }

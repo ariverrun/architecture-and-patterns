@@ -28,7 +28,7 @@ class ScopedDependencyResolverTest extends TestCase
     {
         $dependencyResolver = new ScopedDependencyResolver();
 
-        $dependencyResolver->resolve('Ioc.Register', $key, static function() use ($value): mixed {
+        $dependencyResolver->resolve('Ioc.Register', $key, static function () use ($value): mixed {
             return $value;
         })();
 
@@ -55,7 +55,7 @@ class ScopedDependencyResolverTest extends TestCase
             ],
             [
                 'key' => 'dep4',
-                'value' => static function(): bool {
+                'value' => static function (): bool {
                     return true;
                 },
             ],
