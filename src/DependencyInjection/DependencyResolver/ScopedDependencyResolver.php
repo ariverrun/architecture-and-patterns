@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\DependencyInjection\DependencyResolver;
 
+use App\AutoGeneration\AdapterClassMaker;
 use App\Command\CreateNewScopeCommand;
 use App\Command\SetCurrentScopeCommand;
 use App\DependencyInjection\Exception\DependencyNotFoundException;
 use App\DependencyInjection\Exception\ScopeAlreadyExistsException;
 use App\DependencyInjection\Exception\ScopeNotFoundException;
+use App\GameObject\ObjectWithPropertiesContainerInterface;
 use Closure;
 
 class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSupportingDependencyResolver
@@ -32,6 +34,17 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
 
         $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.New'] = function (string $scopeId): CreateNewScopeCommand {
             return new CreateNewScopeCommand($this, $scopeId);
+        };
+
+        $adapterClassMaker = new AdapterClassMaker();
+
+        $this->scopes[self::ROOT_SCOPE_ID]['Adapter'] = static function (
+            ObjectWithPropertiesContainerInterface $object,
+            string ...$interfaces,
+        ) use ($adapterClassMaker): object {
+            $adapterClass = $adapterClassMaker->makeAdapterClass(...$interfaces);
+
+            return new $adapterClass($object);
         };
     }
 
