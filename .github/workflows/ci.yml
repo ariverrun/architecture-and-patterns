@@ -12,17 +12,22 @@ jobs:
   unit_testing:
     runs-on: ubuntu-latest
 
+    container:
+      image: ariverrun/php_multithread
+      env:
+        NODE_ENV: development
+      volumes:
+        - my_docker_volume:/volume_mount
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-
       - name: Install dependencies via Composer
         run: composer install
+
+      - name: Run App.php
+        run: php src/app.php
 
       - name: Run Unit-tests
         run: php vendor/bin/phpunit tests    
