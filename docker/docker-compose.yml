@@ -1,0 +1,10 @@
+services:
+    php:
+        build:
+            context: './../'
+            dockerfile: 'docker/php/Dockerfile'
+            args:
+                USER_ID: "${USER_ID}"
+                GROUP_ID: "${GROUP_ID}"
+
+
