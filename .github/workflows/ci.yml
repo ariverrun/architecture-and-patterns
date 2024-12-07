@@ -12,22 +12,22 @@ jobs:
   unit_testing:
     runs-on: ubuntu-latest
 
+    container:
+      image: ariverrun/php_multithread
+      env:
+        NODE_ENV: development
+      volumes:
+        - my_docker_volume:/volume_mount
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build PHP Multithread Docker image
-        run: |
-          docker pull ariverrun/php_multithread
-
       - name: Install dependencies via Composer
-        run: docker run --rm ariverrun/php_multithread composer install
+        run: composer install
 
       - name: Run App.php
-        run: docker run --rm ariverrun/php_multithread php src/app.php
+        run: php src/app.php
 
       - name: Run Unit-tests
-        run: docker run --rm ariverrun/php_multithread php vendor/bin/phpunit tests    
+        run: php vendor/bin/phpunit tests    
