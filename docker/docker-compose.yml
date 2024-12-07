@@ -1,8 +1,8 @@
 services:
-    php:
+    php_multithread:
         build:
             context: './../'
-            dockerfile: 'docker/php/Dockerfile'
+            dockerfile: 'docker/php_multithread/Dockerfile'
         volumes:
             - "../:/var/www/html"   
         ports:

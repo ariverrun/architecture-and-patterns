@@ -1,7 +1,7 @@
 include docker/.env
 
 DOCKER_COMPOSE = docker compose --env-file ./docker/.env
-DOCKER_COMPOSE_PHP_EXEC = ${DOCKER_COMPOSE} exec php
+DOCKER_COMPOSE_PHP_EXEC = ${DOCKER_COMPOSE} exec php_multithread
 
 dc_build:
 	${DOCKER_COMPOSE} build
