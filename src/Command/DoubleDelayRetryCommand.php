@@ -11,5 +11,5 @@ class DoubleDelayRetryCommand extends DelayRetryCommand
         $this->commandQueue->enqueue(
             new DoubleRetryCommand($this->command)
         );
-    }    
+    }
 }

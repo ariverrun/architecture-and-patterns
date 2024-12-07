@@ -22,20 +22,22 @@ abstract class AbstractCommandStrategyTestCase extends TestCase
         $enqueuedCommands = $dequeuedCommands = [];
 
         $queue->method('enqueue')
-            ->willReturnCallback(function(CommandInterface $command) use($queue, &$enqueuedCommands): void {
+            ->willReturnCallback(function (CommandInterface $command) use ($queue, &$enqueuedCommands): void {
                 $queue->commands[] = $command;
                 $enqueuedCommands[] = $command;
             });
 
         $queue->method('dequeue')
-            ->willReturnCallback(function() use($queue, &$dequeuedCommands): ?CommandInterface {
+            ->willReturnCallback(function () use ($queue, &$dequeuedCommands): ?CommandInterface {
                 $command = array_shift($queue->commands);
+
                 if (null !== $command) {
                     $dequeuedCommands[] = $command;
                 }
+
                 return $command;
             });
-        
+
         $strategyClass = $this->getStrategyClass();
 
         (new $strategyClass($queue, $logger))();
