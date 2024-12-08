@@ -26,8 +26,5 @@ jobs:
       - name: Install dependencies via Composer
         run: composer install
 
-      - name: Run App.php
-        run: php src/app.php
-
       - name: Run Unit-tests
         run: php vendor/bin/phpunit tests    
