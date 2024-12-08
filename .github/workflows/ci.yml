@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: ariverrun/php_multithread
+      image: phpswoole/swoole:latest
       env:
         NODE_ENV: development
       volumes:
@@ -25,9 +25,6 @@ jobs:
 
       - name: Install dependencies via Composer
         run: composer install
-
-      - name: Run App.php
-        run: php src/app.php
 
       - name: Run Unit-tests
         run: php vendor/bin/phpunit tests    

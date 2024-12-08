@@ -1,8 +1,8 @@
 services:
-    php_multithread:
+    php_swoole_composer:
         build:
             context: './../'
-            dockerfile: 'docker/php_multithread/Dockerfile'
+            dockerfile: 'docker/php_swoole_composer/Dockerfile'
         volumes:
             - "../:/var/www/html"   
         ports:

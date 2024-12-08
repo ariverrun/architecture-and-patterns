@@ -1,7 +1,7 @@
 include docker/.env
 
 DOCKER_COMPOSE = docker compose --env-file ./docker/.env
-DOCKER_COMPOSE_PHP_EXEC = ${DOCKER_COMPOSE} exec php_multithread
+DOCKER_COMPOSE_PHP_EXEC = ${DOCKER_COMPOSE} exec php_swoole_composer
 
 dc_build:
 	${DOCKER_COMPOSE} build
@@ -29,3 +29,6 @@ cs_fix:
 
 tests_run:
 	${DOCKER_COMPOSE_PHP_EXEC}  vendor/bin/phpunit tests
+
+run_app:
+	${DOCKER_COMPOSE_PHP_EXEC} php src/app.php
