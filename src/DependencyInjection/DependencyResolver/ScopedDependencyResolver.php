@@ -49,8 +49,8 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
     }
 
     public function resolve(string $dependencyKey, mixed ...$args): mixed
-    {
-        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {
+    { 
+        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {           
             return ($this->scopes[$this->currentScopeId][$dependencyKey])(...$args);
         }
 
@@ -58,7 +58,7 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
             return ($this->scopes[self::ROOT_SCOPE_ID][$dependencyKey])(...$args);
         }
 
-        throw new DependencyNotFoundException();
+        throw new DependencyNotFoundException("Dependency '{$dependencyKey}' not found");
     }
 
     public function getCurrentScopeId(): string
