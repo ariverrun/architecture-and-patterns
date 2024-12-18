@@ -11,4 +11,6 @@ interface CommandQueueInterface
     public function dequeue(): ?CommandInterface;
 
     public function enqueue(CommandInterface $value): void;
+
+    public function getId(): string;
 }

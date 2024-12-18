@@ -1,0 +1,9 @@
+queue_coroutines_amount: 1
+
+boot_commands:
+  App\Command\RegisterDefaultGameOperationsCommand: ~
+  App\Command\RegisterGameObjectOperationsCommand: ~
+  App\Command\RegisterLoggersCommand: ~
+  App\Command\RegisterSerializationServicesCommand: ~
+  App\Command\RegisterGameObjectsPoolAccessCommand: ~
+  App\Command\InitExampleGamesCommand: ~

@@ -8,4 +8,17 @@ services:
         ports:
             - ${PHP_HOST_PORT}:8000
 
+    rabbitmq:
+        image: rabbitmq:3.9-management
+        platform: linux/amd64
+        volumes:
+            - rabbitmq-volume:/var/lib/rabbitmq
+        environment:
+            RABBITMQ_DEFAULT_VHOST: 'local'
+        restart: unless-stopped
+        ports:
+            - ${RABBITMQ_HOST_PORT}:15672
+
+volumes:
+    rabbitmq-volume:
 

@@ -12,6 +12,10 @@ class CommandQueue implements CommandQueueInterface
      * @var CommandInterface[]
      */
     private array $commands = [];
+    public function __construct(
+        private readonly string $qeueuId,
+    ) {
+    }
 
     public function dequeue(): ?CommandInterface
     {
@@ -21,5 +25,10 @@ class CommandQueue implements CommandQueueInterface
     public function enqueue(CommandInterface $command): void
     {
         $this->commands[] = $command;
+    }
+
+    public function getId(): string
+    {
+        return $this->qeueuId;
     }
 }

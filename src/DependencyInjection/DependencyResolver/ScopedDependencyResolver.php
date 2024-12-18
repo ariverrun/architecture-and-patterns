@@ -22,6 +22,46 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
 
     public function __construct()
     {
+       $this->fillScopesWithDefaultDependencies();
+    }
+
+    public function resolve(string $dependencyKey, mixed ...$args): mixed
+    {
+        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {
+            return ($this->scopes[$this->currentScopeId][$dependencyKey])(...$args);
+        }
+
+        if (isset($this->scopes[self::ROOT_SCOPE_ID][$dependencyKey])) {
+            return ($this->scopes[self::ROOT_SCOPE_ID][$dependencyKey])(...$args);
+        }
+
+        throw new DependencyNotFoundException("Dependency '{$dependencyKey}' not found");
+    }
+
+    public function getCurrentScopeId(): string
+    {
+        return $this->currentScopeId;
+    }
+
+    public function setCurrentScopeId(string $scopeId): void
+    {
+        if (false === array_key_exists($scopeId, $this->scopes)) {
+            throw new ScopeNotFoundException();
+        }
+
+        $this->currentScopeId = $scopeId;
+    }
+
+    public function createNewScope(string $scopeId): void
+    {
+        if (true === array_key_exists($scopeId, $this->scopes)) {
+            throw new ScopeAlreadyExistsException();
+        }
+        $this->scopes[$scopeId] = [];
+    }
+
+    private function fillScopesWithDefaultDependencies(): void
+    {
         $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Register'] = function (string $dependencyKey, Closure $dependencyBuildingClosure): Closure {
             return function () use ($dependencyKey, $dependencyBuildingClosure): void {
                 $this->scopes[$this->currentScopeId][$dependencyKey] = $dependencyBuildingClosure;
@@ -46,40 +86,5 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
 
             return new $adapterClass($object);
         };
-    }
-
-    public function resolve(string $dependencyKey, mixed ...$args): mixed
-    {
-        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {
-            return ($this->scopes[$this->currentScopeId][$dependencyKey])(...$args);
-        }
-
-        if (isset($this->scopes[self::ROOT_SCOPE_ID][$dependencyKey])) {
-            return ($this->scopes[self::ROOT_SCOPE_ID][$dependencyKey])(...$args);
-        }
-
-        throw new DependencyNotFoundException();
-    }
-
-    public function getCurrentScopeId(): string
-    {
-        return $this->currentScopeId;
-    }
-
-    public function setCurrentScopeId(string $scopeId): void
-    {
-        if (false === array_key_exists($scopeId, $this->scopes)) {
-            throw new ScopeNotFoundException();
-        }
-
-        $this->currentScopeId = $scopeId;
-    }
-
-    public function createNewScope(string $scopeId): void
-    {
-        if (true === array_key_exists($scopeId, $this->scopes)) {
-            throw new ScopeAlreadyExistsException();
-        }
-        $this->scopes[$scopeId] = [];
     }
 }

@@ -26,8 +26,8 @@ $exceptionHandler = new CommandExceptionHandler();
 $handlerStrategyA = new LoopQueueStrategy($exceptionHandler);
 $handlerStrategyB = new LoopQueueStrategy($exceptionHandler);
 
-$queueA = new CommandQueue();
-$queueB = new CommandQueue();
+$queueA = new CommandQueue('a');
+$queueB = new CommandQueue('b');
 
 $coroutineA = new CommandQueueCoroutine('threadA', $queueA, $handlerStrategyA, $exceptionHandler);
 $coroutineB = new CommandQueueCoroutine('threadB', $queueB, $handlerStrategyB, $exceptionHandler);
