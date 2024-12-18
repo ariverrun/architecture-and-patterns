@@ -2,4 +2,6 @@ queues:
   game_commands:
     consumers:
       - App\Consumer\GameOperationConsumer
+
+queue_coroutines_amount: 2
   

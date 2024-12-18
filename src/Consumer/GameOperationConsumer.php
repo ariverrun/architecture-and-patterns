@@ -15,12 +15,12 @@ class GameOperationConsumer implements AMQPConsumerInterface
     public function consume(GameOperationMessageDto $message): void
     {
         /** @var CommandQueueInterface $queue */
-        $queue = Ioc::resolve('Game.Queue.Get', $message->gameId);
+        $queue = IoC::resolve('Game.Queue.Get', $message->gameId);
 
         /** @var ObjectWithPropertiesContainerInterface $object */
-        $object = Ioc::resolve('Game.Object.Get', $message->objectId);
+        $object = IoC::resolve('Game.Object.Get', $message->objectId, $message->gameId);
 
-        $command = new InterpretCommand($message->operationId, $object, $message->args);
+        $command = new InterpretCommand($message->operationId, $object, $message->args, $queue);
 
         $queue->enqueue($command);
     }

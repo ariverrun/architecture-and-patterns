@@ -11,15 +11,36 @@ use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
 use App\CommandQueue\LoopQueueStrategy;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
+use App\DependencyInjection\IoC;
+use Tests\Traits\IocSetupTrait;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class HardStoppingQueueTest extends TestCase
 {
+    use IocSetupTrait;
+
+    public function setUp(): void
+    {
+        $this->setUpIocDependencyResolver();
+    }
+
+    public function tearDown(): void
+    {
+        $this->setUpIocDependencyResolver();
+    }
+
     public function testQueueHardStopping(): void
     {
+        $logger = $this->createMock(LoggerInterface::class);
+
+        IoC::resolve('Ioc.Register', 'Logger', static function (?string $loggerKey = null) use ($logger): LoggerInterface {
+            return $logger;
+        })();        
+
         (new Runtime(function (): void {
 
-            $queue = new CommandQueue();
+            $queue = new CommandQueue('1');
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 

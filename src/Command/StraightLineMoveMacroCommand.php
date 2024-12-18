@@ -7,7 +7,7 @@ namespace App\Command;
 use App\GameObject\HavingFuelObjectInterface;
 use App\GameObject\MovingObjectInterface;
 
-class StraightLineMoveMacroCommand extends MacroCommand
+class StraightLineMoveMacroCommand extends MacroCommand implements GameObjectOperationCommandInterface
 {
     /**
      * @var CommandInterface[]

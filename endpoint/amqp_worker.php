@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Kernel\AMQPKernel;
+use App\AMQP\AMQPApplication;
+use App\Kernel\Kernel;
 
-(new AMQPKernel())
+(new Kernel(new AMQPApplication()))
     ->bootstrap()
-    ->run();
+    ->run()
+    ->terminate();

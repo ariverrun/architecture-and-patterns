@@ -21,6 +21,6 @@ class RegisterAMQPServicesCommand extends MacroCommand
             ),
         ];
 
-        $this->commands = $commands;        
+        $this->commands = $commands;
     }
 }

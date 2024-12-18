@@ -18,7 +18,7 @@ class AsyncQueueHandlingTest extends TestCase
     public function testAsyncQueueHandlingByCommand(): void
     {
         (new Runtime(function () {
-            $queue = new CommandQueue();
+            $queue = new CommandQueue('1');
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 

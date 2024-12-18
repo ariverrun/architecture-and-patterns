@@ -1,0 +1,14 @@
+services:
+    rabbitmq:
+        networks:
+            - default
+            - service-connecting-network
+
+    php_swoole_composer:
+        networks:
+            - default
+            - service-connecting-network
+
+networks:
+    service-connecting-network:
+        external: true

@@ -10,7 +10,7 @@ use App\AMQP\Callback\AMQPCallbackInterface;
 class RegisterAMQPCallback implements CommandInterface
 {
     public function __construct(
-       private readonly AMQPCallbackInterface $callback,
+        private readonly AMQPCallbackInterface $callback,
     ) {
     }
 
@@ -18,8 +18,8 @@ class RegisterAMQPCallback implements CommandInterface
     {
         $callback = $this->callback;
 
-        Ioc::resolve('Ioc.Register', 'Amqp.MessageCallback.Get', static function() use($callback): callable {
-            return function($message) use($callback) {
+        IoC::resolve('Ioc.Register', 'Amqp.MessageCallback.Get', static function () use ($callback): callable {
+            return function ($message) use ($callback) {
                 return ($callback)($message);
             };
         })();

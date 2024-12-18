@@ -22,35 +22,12 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
 
     public function __construct()
     {
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Register'] = function (string $dependencyKey, Closure $dependencyBuildingClosure): Closure {
-            return function () use ($dependencyKey, $dependencyBuildingClosure): void {
-                $this->scopes[$this->currentScopeId][$dependencyKey] = $dependencyBuildingClosure;
-            };
-        };
-
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.SetCurrent'] = function (string $scopeId): SetCurrentScopeCommand {
-            return new SetCurrentScopeCommand($this, $scopeId);
-        };
-
-        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.New'] = function (string $scopeId): CreateNewScopeCommand {
-            return new CreateNewScopeCommand($this, $scopeId);
-        };
-
-        $adapterClassMaker = new AdapterClassMaker();
-
-        $this->scopes[self::ROOT_SCOPE_ID]['Adapter'] = static function (
-            ObjectWithPropertiesContainerInterface $object,
-            string ...$interfaces,
-        ) use ($adapterClassMaker): object {
-            $adapterClass = $adapterClassMaker->makeAdapterClass(...$interfaces);
-
-            return new $adapterClass($object);
-        };
+       $this->fillScopesWithDefaultDependencies();
     }
 
     public function resolve(string $dependencyKey, mixed ...$args): mixed
-    { 
-        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {           
+    {
+        if (isset($this->scopes[$this->currentScopeId][$dependencyKey])) {
             return ($this->scopes[$this->currentScopeId][$dependencyKey])(...$args);
         }
 
@@ -81,5 +58,33 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
             throw new ScopeAlreadyExistsException();
         }
         $this->scopes[$scopeId] = [];
+    }
+
+    private function fillScopesWithDefaultDependencies(): void
+    {
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Register'] = function (string $dependencyKey, Closure $dependencyBuildingClosure): Closure {
+            return function () use ($dependencyKey, $dependencyBuildingClosure): void {
+                $this->scopes[$this->currentScopeId][$dependencyKey] = $dependencyBuildingClosure;
+            };
+        };
+
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.SetCurrent'] = function (string $scopeId): SetCurrentScopeCommand {
+            return new SetCurrentScopeCommand($this, $scopeId);
+        };
+
+        $this->scopes[self::ROOT_SCOPE_ID]['Ioc.Scope.New'] = function (string $scopeId): CreateNewScopeCommand {
+            return new CreateNewScopeCommand($this, $scopeId);
+        };
+
+        $adapterClassMaker = new AdapterClassMaker();
+
+        $this->scopes[self::ROOT_SCOPE_ID]['Adapter'] = static function (
+            ObjectWithPropertiesContainerInterface $object,
+            string ...$interfaces,
+        ) use ($adapterClassMaker): object {
+            $adapterClass = $adapterClassMaker->makeAdapterClass(...$interfaces);
+
+            return new $adapterClass($object);
+        };
     }
 }
