@@ -32,3 +32,9 @@ tests_run:
 
 run_app:
 	${DOCKER_COMPOSE_PHP_EXEC} php src/app.php
+
+amqp_consume:
+	${DOCKER_COMPOSE_PHP_EXEC} php endpoint/amqp_worker.php
+
+composer:
+	${DOCKER_COMPOSE_PHP_EXEC} composer install -n
