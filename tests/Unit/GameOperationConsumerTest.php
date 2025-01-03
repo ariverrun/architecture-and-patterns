@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Command\CommandInterface;
 use App\Command\InterpretCommand;
 use App\CommandQueue\CommandQueueInterface;
 use App\Consumer\GameOperationConsumer;
@@ -27,7 +26,7 @@ class GameOperationConsumerTest extends TestCase
     {
         $this->setUpIocDependencyResolver();
     }
-    
+
     public function testSuccessfulConsume(): void
     {
         $gameId = 1;
@@ -48,12 +47,12 @@ class GameOperationConsumerTest extends TestCase
         IoC::resolve('Ioc.Register', 'Game.Queue.Get', static function (int $gameId) use ($queueMock): CommandQueueInterface {
             return $queueMock;
         })();
-        
+
         $objectMock = $this->createMock(ObjectWithPropertiesContainerInterface::class);
 
-        IoC::resolve('Ioc.Register', 'Game.Object.Get', static function (string $objectId, int $gameId) use($objectMock): ObjectWithPropertiesContainerInterface {
+        IoC::resolve('Ioc.Register', 'Game.Object.Get', static function (string $objectId, int $gameId) use ($objectMock): ObjectWithPropertiesContainerInterface {
             return $objectMock;
-        })();        
+        })();
 
         $queueMock->expects($this->once())
                     ->method('enqueue')

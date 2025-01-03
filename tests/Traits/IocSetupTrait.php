@@ -7,7 +7,7 @@ namespace Tests\Traits;
 use App\DependencyInjection\DependencyResolver\InitialDependencyResolver;
 use App\DependencyInjection\DependencyResolver\ScopedDependencyResolver;
 use App\DependencyInjection\IoC;
-use \ReflectionClass;
+use ReflectionClass;
 
 trait IocSetupTrait
 {
@@ -20,10 +20,10 @@ trait IocSetupTrait
         $dependencyResolverProperty->setAccessible(true);
 
         if (
-            !$dependencyResolverProperty->isInitialized() ||
-            $dependencyResolverProperty->getValue() instanceof InitialDependencyResolver
+            !$dependencyResolverProperty->isInitialized()
+            || $dependencyResolverProperty->getValue() instanceof InitialDependencyResolver
         ) {
-            IoC::resolve('Ioc.DependencyResolver.Update', new ScopedDependencyResolver())->execute();            
+            IoC::resolve('Ioc.DependencyResolver.Update', new ScopedDependencyResolver())->execute();
         } else {
             $dependencyResolver = $dependencyResolverProperty->getValue();
 
@@ -32,8 +32,8 @@ trait IocSetupTrait
 
                 $scopesProperty = $dependencyResolverReflector->getProperty('scopes');
 
-                $scopesProperty->setAccessible(true);           
-                
+                $scopesProperty->setAccessible(true);
+
                 $scopesProperty->setValue($dependencyResolver, []);
 
                 $fillScopesWithDefaultDependenciesMethod = $dependencyResolverReflector->getMethod('fillScopesWithDefaultDependencies');
@@ -44,8 +44,8 @@ trait IocSetupTrait
 
                 $fillScopesWithDefaultDependenciesMethod->setAccessible(false);
 
-                $scopesProperty->setAccessible(false);           
-            }            
+                $scopesProperty->setAccessible(false);
+            }
         }
 
         $dependencyResolverProperty->setAccessible(false);
