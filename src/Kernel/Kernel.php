@@ -11,7 +11,7 @@ use App\Command\AsyncQueueHandlingCommand;
 use App\Command\CommandInterface;
 use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
-use App\CommandQueue\LoopQueueStrategy;
+use App\CommandQueue\StatefulQueueStrategy;
 use App\CommandQueue\CommandQueueInterface;
 use App\CommandExceptionHandler\CommandExceptionHandler;
 use App\DependencyInjection\DependencyResolver\ScopedDependencyResolver;
@@ -143,7 +143,7 @@ class Kernel
             $coroutine = new CommandQueueCoroutine(
                 $coroutineId,
                 $queue,
-                new LoopQueueStrategy($exceptionHandler),
+                new StatefulQueueStrategy($exceptionHandler),
                 $exceptionHandler
             );
             $this->commandsToExecuteOnRun[] = new AsyncQueueHandlingCommand($coroutine);

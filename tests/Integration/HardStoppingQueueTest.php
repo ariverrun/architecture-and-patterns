@@ -9,7 +9,7 @@ use App\Command\CommandInterface;
 use App\Command\HardStopQueueCommand;
 use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
-use App\CommandQueue\LoopQueueStrategy;
+use App\CommandQueue\StatefulQueueStrategy;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
 use App\DependencyInjection\IoC;
 use Tests\Traits\IocSetupTrait;
@@ -36,7 +36,7 @@ class HardStoppingQueueTest extends TestCase
 
         IoC::resolve('Ioc.Register', 'Logger', static function (?string $loggerKey = null) use ($logger): LoggerInterface {
             return $logger;
-        })();        
+        })();
 
         (new Runtime(function (): void {
 
@@ -44,7 +44,7 @@ class HardStoppingQueueTest extends TestCase
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 
-            $handlerStrategy = new LoopQueueStrategy($exceptionHandler);
+            $handlerStrategy = new StatefulQueueStrategy($exceptionHandler);
 
             $coroutine = new CommandQueueCoroutine('1', $queue, $handlerStrategy, $exceptionHandler);
 
