@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\AMQP;
 
-use App\AMQP\Callback\MultipleConsumersCallback;
+use App\AMQP\Callback\MultipleConsumersWithFireWallsCallback;
 use App\AMQP\Consumer\AMQPConsumerInterface;
+use App\AMQP\Firewall\FirewallInterface;
 use App\Application\ApplicationInterface;
 use App\Application\Exception\InvalidConfigurationException;
 use App\DependencyInjection\IoC;
@@ -25,8 +26,18 @@ class AMQPApplication implements ApplicationInterface
      */
     private readonly array $queuesConfig;
 
+    /**
+     * @var array<string, array{class: string, consumers: string[]}>
+     */
+    private readonly array $firewallsConfig;
+
     private readonly int $queueCoroutinesAmount;
     private readonly LoggerInterface $logger;
+
+    /**
+     * @var array<string, FirewallInterface>
+     */
+    private array $fireWalls = [];
 
     public function bootstrap(): self
     {
@@ -45,7 +56,15 @@ class AMQPApplication implements ApplicationInterface
 
         Assert::allIsArray($appConfig['queues']);
 
-        $this->queuesConfig = $appConfig['queues'];
+        $this->queuesConfig = $appConfig['firewalls'];
+
+        if (!array_key_exists('firewalls', $appConfig)) {
+            throw new InvalidConfigurationException("Missing required configuration parameter 'queuefirewallss'");
+        }
+
+        Assert::allIsArray($appConfig['firewalls']);
+
+        $this->firewallsConfig = $appConfig['firewalls'];
 
         $this->logger = IoC::resolve('Logger');
 
@@ -71,14 +90,21 @@ class AMQPApplication implements ApplicationInterface
 
             $consumers = [];
 
+            $fireWallsByConsumer = [];
+
             foreach ($queueConfig['consumers'] as $consumerClass) {
+
+                $consumerFileWalls = $this->getFireWallsByConsumer($consumerClass);
+                $fireWallsByConsumer[$consumerClass] = $consumerFileWalls;
+
                 Assert::subclassOf($consumerClass, AMQPConsumerInterface::class);
                 $consumers[] = new $consumerClass();
             }
 
-            $callback = new MultipleConsumersCallback(
+            $callback = new MultipleConsumersWithFireWallsCallback(
                 $queueName,
                 $consumers,
+                $fireWallsByConsumer,
                 $serializer,
             );
 
@@ -99,5 +125,27 @@ class AMQPApplication implements ApplicationInterface
     public function getQueueCoroutinesAmount(): ?int
     {
         return $this->queueCoroutinesAmount ?? null;
+    }
+
+    /**
+     * @return FirewallInterface[]
+     */
+    private function getFireWallsByConsumer(string $consumerClass): array
+    {
+        $firewalls = [];
+
+        foreach ($this->firewallsConfig as $fireWallConfig) {
+            if (in_array($consumerClass, $fireWallConfig['consumers'])) {
+                $fireWallClass = $fireWallConfig['class'];
+
+                if (!isset($this->fireWalls[$fireWallClass])) {
+                    $this->fireWalls[$fireWallClass] = new $fireWallClass();
+                }
+
+                $firewalls[] = $this->fireWalls[$fireWallClass];
+            }
+        }
+
+        return $firewalls;
     }
 }

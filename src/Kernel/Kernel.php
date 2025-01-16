@@ -38,7 +38,14 @@ class Kernel
         $dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
         $dotenv->load();
 
+        if (file_exists(__DIR__ . '/../.env.local')) {
+            $dotenvLocal = Dotenv::createImmutable(__DIR__ . '/../..', '.env.local');
+            $dotenvLocal->load();
+        }
+
         IoC::resolve('Ioc.DependencyResolver.Update', new ScopedDependencyResolver())->execute();
+
+        $this->parseEnvVariables();
 
         $kernelConfig = Yaml::parseFile(__DIR__ . '/../../config/kernel.yml');
 
@@ -166,5 +173,19 @@ class Kernel
 
             return $queue;
         })();
+    }
+
+    private function parseEnvVariables(): void
+    {
+        foreach ($_ENV as $envVarName => $envVarValue) {
+
+            if (str_contains($envVarValue, '%app_dir%')) {
+                $envVarValue = str_replace('%app_dir%', __DIR__ . '/../..', $envVarValue);
+            }
+
+            IoC::resolve('Ioc.Register', 'Env.' . $envVarName, static function () use ($envVarValue): string {
+                return $envVarValue;
+            })();
+        }
     }
 }
