@@ -36,7 +36,7 @@ class HardStoppingQueueTest extends TestCase
 
         IoC::resolve('Ioc.Register', 'Logger', static function (?string $loggerKey = null) use ($logger): LoggerInterface {
             return $logger;
-        })();        
+        })();
 
         (new Runtime(function (): void {
 

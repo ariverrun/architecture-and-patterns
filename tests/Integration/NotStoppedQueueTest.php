@@ -26,15 +26,15 @@ class NotStoppedQueueTest extends TestCase
     public function tearDown(): void
     {
         $this->setUpIocDependencyResolver();
-    }    
+    }
     public function testQueueHardStopping(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
         IoC::resolve('Ioc.Register', 'Logger', static function (?string $loggerKey = null) use ($logger): LoggerInterface {
             return $logger;
-        })();     
-        
+        })();
+
         (new Runtime(function (): void {
 
             $queue = new CommandQueue('1');

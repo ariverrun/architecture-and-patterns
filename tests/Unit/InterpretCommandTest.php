@@ -11,7 +11,7 @@ use App\DependencyInjection\IoC;
 use App\GameObject\ObjectWithPropertiesContainerInterface;
 use Tests\Traits\IocSetupTrait;
 use PHPUnit\Framework\TestCase;
-use \InvalidArgumentException;
+use InvalidArgumentException;
 
 class InterpretCommandTest extends TestCase
 {
@@ -26,11 +26,11 @@ class InterpretCommandTest extends TestCase
     {
         $this->setUpIocDependencyResolver();
     }
-    
+
     public function testSuccessfulInterpretation(): void
     {
         $operationId = '1';
-        
+
         $objectMock = $this->createMock(ObjectWithPropertiesContainerInterface::class);
 
         $commandMock = $this->createMock(CommandInterface::class);
@@ -44,7 +44,7 @@ class InterpretCommandTest extends TestCase
         $queueMock->expects($this->once())
                     ->method('enqueue')
                     ->with($this->equalToCanonicalizing($commandMock));
-                    
+
         (new InterpretCommand(
             $operationId,
             $objectMock,
@@ -56,7 +56,7 @@ class InterpretCommandTest extends TestCase
     public function testOperationNotFound(): void
     {
         $operationId = '1';
-        
+
         $objectMock = $this->createMock(ObjectWithPropertiesContainerInterface::class);
 
         IoC::resolve('Ioc.Register', 'Game.Operation.Get', static function (string $operationId, ObjectWithPropertiesContainerInterface $object, mixed $args): null {
@@ -69,12 +69,12 @@ class InterpretCommandTest extends TestCase
                     ->method('enqueue');
 
         $this->expectException(InvalidArgumentException::class);
-                    
+
         (new InterpretCommand(
             $operationId,
             $objectMock,
             null,
             $queueMock,
         ))->execute();
-    }    
+    }
 }

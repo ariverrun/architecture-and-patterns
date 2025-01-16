@@ -22,7 +22,7 @@ class ScopedDependencyResolver implements DependencyResolverInterface, ScopesSup
 
     public function __construct()
     {
-       $this->fillScopesWithDefaultDependencies();
+        $this->fillScopesWithDefaultDependencies();
     }
 
     public function resolve(string $dependencyKey, mixed ...$args): mixed
