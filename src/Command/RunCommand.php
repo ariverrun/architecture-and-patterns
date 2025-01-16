@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\CommandQueue\CommandQueueCoroutine;
-use App\CommandQueue\State\RunningUntilEmptyQueueState;
+use App\CommandQueue\State\RunningQueueState;
 use App\DependencyInjection\IoC;
 
-class SoftStopQueueCommand implements CommandInterface
+class RunCommand implements CommandInterface
 {
     public function __construct(
         private readonly CommandQueueCoroutine $commandQueueCoroutine,
@@ -18,7 +18,7 @@ class SoftStopQueueCommand implements CommandInterface
     public function execute(): void
     {
         $this->commandQueueCoroutine->updateState(
-            new RunningUntilEmptyQueueState(
+            new RunningQueueState(
                 $this->commandQueueCoroutine->getExceptionHandler(),
                 IoC::resolve('Logger'),
             )

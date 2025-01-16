@@ -9,7 +9,8 @@ use App\Async\Async;
 use App\Command\AsyncQueueHandlingCommand;
 use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
-use App\CommandQueue\CommandQueueHandlerStrategyInterface;
+use App\CommandQueue\StatefulCommandQueueHandlerStrategyInterface;
+use App\CommandQueue\State\CommandQueueStateInterface;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -22,20 +23,19 @@ class AsyncQueueHandlingTest extends TestCase
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 
-            $coroutine = new CommandQueueCoroutine('1', $queue, $this->createMock(CommandQueueHandlerStrategyInterface::class), $exceptionHandler);
+            $coroutine = new CommandQueueCoroutine('1', $queue, $this->createMock(StatefulCommandQueueHandlerStrategyInterface::class), $exceptionHandler);
 
             $asyncronouslySetFlag = false;
 
-
-            $handlerStrategy = $this->createMock(CommandQueueHandlerStrategyInterface::class);
+            $handlerStrategy = $this->createMock(StatefulCommandQueueHandlerStrategyInterface::class);
             $handlerStrategy->expects($this->once())
                             ->method('doHandle')
-                            ->willReturnCallback(function () use ($coroutine, &$asyncronouslySetFlag): bool {
-                                $coroutine->gracefullyStop();
+                            ->willReturnCallback(function () use ($coroutine, &$asyncronouslySetFlag): ?CommandQueueStateInterface {
+                                $coroutine->updateState(null);
                                 Async::sleep(0.001);
                                 $asyncronouslySetFlag = true;
 
-                                return false;
+                                return null;
                             });
             $coroutine->overrideHandlerStrategy($handlerStrategy);
 

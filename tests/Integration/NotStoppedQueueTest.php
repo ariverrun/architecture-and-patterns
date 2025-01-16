@@ -8,7 +8,7 @@ use App\Async\Runtime;
 use App\Command\CommandInterface;
 use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
-use App\CommandQueue\LoopQueueStrategy;
+use App\CommandQueue\StatefulQueueStrategy;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
 use App\DependencyInjection\IoC;
 use Tests\Traits\IocSetupTrait;
@@ -41,7 +41,7 @@ class NotStoppedQueueTest extends TestCase
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 
-            $handlerStrategy = new LoopQueueStrategy($exceptionHandler);
+            $handlerStrategy = new StatefulQueueStrategy($exceptionHandler);
 
             $coroutine = new CommandQueueCoroutine('1', $queue, $handlerStrategy, $exceptionHandler);
 
@@ -72,7 +72,7 @@ class NotStoppedQueueTest extends TestCase
             $command->expects($this->once())
                     ->method('execute')
                     ->willReturnCallback(function () use ($coroutine) {
-                        $coroutine->gracefullyStop();
+                        $coroutine->updateState(null);
                     });
 
             $queue->enqueue($command);

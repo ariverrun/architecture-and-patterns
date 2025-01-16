@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
+use App\Async\Async;
 use App\Async\Runtime;
 use App\Command\CommandInterface;
-use App\Command\SoftStopQueueCommand;
+use App\Command\MoveToCommand;
 use App\CommandQueue\CommandQueue;
 use App\CommandQueue\CommandQueueCoroutine;
+use App\CommandQueue\CommandQueueCoroutineStatus;
 use App\CommandQueue\StatefulQueueStrategy;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
 use App\DependencyInjection\IoC;
@@ -16,7 +18,7 @@ use Tests\Traits\IocSetupTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SoftStoppingQueueTest extends TestCase
+class MovingToQueueTest extends TestCase
 {
     use IocSetupTrait;
 
@@ -24,11 +26,13 @@ class SoftStoppingQueueTest extends TestCase
     {
         $this->setUpIocDependencyResolver();
     }
+
     public function tearDown(): void
     {
         $this->setUpIocDependencyResolver();
     }
-    public function testQueueHardStopping(): void
+
+    public function testMovingCommandsToOtherQueue(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -38,38 +42,54 @@ class SoftStoppingQueueTest extends TestCase
 
         (new Runtime(function (): void {
 
-            $queue = new CommandQueue('1');
+            $queueA = new CommandQueue('1');
 
             $exceptionHandler = $this->createMock(CommandExceptionHandlerInterface::class);
 
             $handlerStrategy = new StatefulQueueStrategy($exceptionHandler);
 
-            $coroutine = new CommandQueueCoroutine('1', $queue, $handlerStrategy, $exceptionHandler);
+            $coroutine = new CommandQueueCoroutine('1', $queueA, $handlerStrategy, $exceptionHandler);
 
             for ($i = 0; $i < 5; ++$i) {
                 $command = $this->createMock(CommandInterface::class);
                 $command->expects($this->once())
                         ->method('execute');
-                $queue->enqueue($command);
+                $queueA->enqueue($command);
             }
 
-            $queue->enqueue(new SoftStopQueueCommand($coroutine));
+            $queueB = new CommandQueue('2');
 
-            for ($i = 0; $i < 3; ++$i) {
+            $queueA->enqueue(new MoveToCommand($coroutine, $queueB));
+
+            $commandsAfterMoveTo = [];
+
+            for ($i = 0; $i < 5; ++$i) {
                 $command = $this->createMock(CommandInterface::class);
-                $command->expects($this->once())
+                $command->expects($this->never())
                         ->method('execute');
-                $queue->enqueue($command);
+                $queueA->enqueue($command);
+                $commandsAfterMoveTo[] = $command;
             }
 
             ($coroutine)();
 
-            for ($i = 0; $i < 2; ++$i) {
-                $command = $this->createMock(CommandInterface::class);
-                $command->expects($this->never())
-                        ->method('execute');
-                $queue->enqueue($command);
-            }
+            (new Async(function () use ($coroutine, $commandsAfterMoveTo, $queueB): void {
+                while (CommandQueueCoroutineStatus::COMPLETED !== $coroutine->getStatus()) {
+                    Async::sleep(0.001);
+                }
+
+                $i = 0;
+
+                while ($command = $queueB->dequeue()) {
+
+                    $this->assertEqualsCanonicalizing($commandsAfterMoveTo[$i], $command);
+
+                    ++$i;
+                }
+
+                $this->assertEquals(count($commandsAfterMoveTo), $i);
+            }))();
+
         }))();
     }
 }

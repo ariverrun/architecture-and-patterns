@@ -6,17 +6,19 @@ namespace Tests\Integration;
 
 use App\Async\Runtime;
 use App\Command\CommandInterface;
-use App\Command\SoftStopQueueCommand;
+use App\Command\RunCommand;
 use App\CommandQueue\CommandQueue;
+use App\CommandQueue\CommandQueueInterface;
 use App\CommandQueue\CommandQueueCoroutine;
 use App\CommandQueue\StatefulQueueStrategy;
+use App\CommandQueue\State\CommandQueueStateInterface;
 use App\CommandExceptionHandler\CommandExceptionHandlerInterface;
 use App\DependencyInjection\IoC;
 use Tests\Traits\IocSetupTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SoftStoppingQueueTest extends TestCase
+class RunningQueueAgainTest extends TestCase
 {
     use IocSetupTrait;
 
@@ -24,11 +26,13 @@ class SoftStoppingQueueTest extends TestCase
     {
         $this->setUpIocDependencyResolver();
     }
+
     public function tearDown(): void
     {
         $this->setUpIocDependencyResolver();
     }
-    public function testQueueHardStopping(): void
+
+    public function testMovingCommandsToOtherQueue(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 
@@ -46,6 +50,35 @@ class SoftStoppingQueueTest extends TestCase
 
             $coroutine = new CommandQueueCoroutine('1', $queue, $handlerStrategy, $exceptionHandler);
 
+            $skippingCommandsState = $this->createMock(CommandQueueStateInterface::class);
+
+            $skippingCommandsState->expects($this->any())
+                                ->method('handle')
+                                ->willReturnCallback(function (CommandQueueInterface $queue): bool {
+                                    $command = $queue->dequeue();
+
+                                    if (null === $command) {
+                                        return false;
+                                    }
+
+                                    if (RunCommand::class === $command::class) {
+                                        $command->execute();
+                                    }
+
+                                    return true;
+                                });
+
+            $coroutine->updateState($skippingCommandsState);
+
+            for ($i = 0; $i < 5; ++$i) {
+                $command = $this->createMock(CommandInterface::class);
+                $command->expects($this->never())
+                        ->method('execute');
+                $queue->enqueue($command);
+            }
+
+            $queue->enqueue(new RunCommand($coroutine));
+
             for ($i = 0; $i < 5; ++$i) {
                 $command = $this->createMock(CommandInterface::class);
                 $command->expects($this->once())
@@ -53,23 +86,16 @@ class SoftStoppingQueueTest extends TestCase
                 $queue->enqueue($command);
             }
 
-            $queue->enqueue(new SoftStopQueueCommand($coroutine));
+            $stoppingCommand = $this->createMock(CommandInterface::class);
+            $stoppingCommand->expects($this->once())
+                    ->method('execute')
+                    ->willReturnCallback(function () use ($coroutine) {
+                        $coroutine->updateState(null);
+                    });
 
-            for ($i = 0; $i < 3; ++$i) {
-                $command = $this->createMock(CommandInterface::class);
-                $command->expects($this->once())
-                        ->method('execute');
-                $queue->enqueue($command);
-            }
+            $queue->enqueue($stoppingCommand);
 
             ($coroutine)();
-
-            for ($i = 0; $i < 2; ++$i) {
-                $command = $this->createMock(CommandInterface::class);
-                $command->expects($this->never())
-                        ->method('execute');
-                $queue->enqueue($command);
-            }
         }))();
     }
 }
