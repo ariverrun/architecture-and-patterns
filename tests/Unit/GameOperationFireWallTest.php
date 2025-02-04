@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\AMQP\Consumer\ConsumingContext;
 use App\DependencyInjection\IoC;
 use App\Consumer\GameOperationMessageDto;
 use App\Firewall\GameOperationFirewall;
@@ -68,7 +69,9 @@ class GameOperationFireWallTest extends TestCase
 
         $dto = new GameOperationMessageDto(1, '1', '1', null);
 
-        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto);
+        $context = new ConsumingContext();
+
+        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto, $context);
 
         $this->assertTrue($isAccessGranted);
     }
@@ -113,7 +116,9 @@ class GameOperationFireWallTest extends TestCase
 
         $dto = new GameOperationMessageDto(1, '1', '1', null);
 
-        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto);
+        $context = new ConsumingContext();
+
+        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto, $context);
 
         $this->assertFalse($isAccessGranted);
     }
@@ -152,7 +157,9 @@ class GameOperationFireWallTest extends TestCase
 
         $dto = new GameOperationMessageDto(1, '1', '1', null);
 
-        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto);
+        $context = new ConsumingContext();
+
+        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto, $context);
 
         $this->assertFalse($isAccessGranted);
     }
@@ -184,7 +191,9 @@ class GameOperationFireWallTest extends TestCase
 
         $dto = new GameOperationMessageDto(1, '1', '1', null);
 
-        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto);
+        $context = new ConsumingContext();
+
+        $isAccessGranted = $fireWall->isAccessGranted($amqpMessageMock, $dto, $context);
 
         $this->assertFalse($isAccessGranted);
     }

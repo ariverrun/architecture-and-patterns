@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\AMQP\Callback;
 
 use App\AMQP\Consumer\AMQPConsumerInterface;
+use App\AMQP\Consumer\ConsumingContext;
 use App\AMQP\Firewall\FirewallInterface;
 use App\DependencyInjection\IoC;
 use App\Exception\AccessDeniedException;
@@ -65,10 +66,12 @@ class MultipleConsumersWithFireWallsCallback implements AMQPCallbackInterface
 
                 $isAccessGranted = true;
 
+                $context = new ConsumingContext();
+
                 foreach ($fireWalls as $fireWall) {
                     if (
                         true === $isAccessGranted
-                        && false === $fireWall->isAccessGranted($message, $argDto)
+                        && false === $fireWall->isAccessGranted($message, $argDto, $context)
                     ) {
                         $isAccessGranted = false;
                     }
@@ -78,7 +81,7 @@ class MultipleConsumersWithFireWallsCallback implements AMQPCallbackInterface
                     throw new AccessDeniedException();
                 }
 
-                $consumer->consume($argDto);
+                $consumer->consume($argDto, $context);
             } catch (Throwable $e) {
                 $this->logger->error('AMQP message consuming failed', ['queue' => $this->queueName, 'message' => $message->getBody(), 'exception' => $e]);
             }

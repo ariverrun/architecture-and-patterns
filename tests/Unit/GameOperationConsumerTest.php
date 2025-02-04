@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use App\AMQP\Consumer\ConsumingContext;
 use App\Command\InterpretCommand;
 use App\CommandQueue\CommandQueueInterface;
 use App\Consumer\GameOperationConsumer;
@@ -50,7 +51,7 @@ class GameOperationConsumerTest extends TestCase
 
         $objectMock = $this->createMock(ObjectWithPropertiesContainerInterface::class);
 
-        IoC::resolve('Ioc.Register', 'Game.Object.Get', static function (string $objectId, int $gameId) use ($objectMock): ObjectWithPropertiesContainerInterface {
+        IoC::resolve('Ioc.Register', 'Game.Object.Get', static function (string $objectId, int $gameId, int $userId) use ($objectMock): ObjectWithPropertiesContainerInterface {
             return $objectMock;
         })();
 
@@ -60,6 +61,8 @@ class GameOperationConsumerTest extends TestCase
                         $this->isInstanceOf(InterpretCommand::class)
                     );
 
-        $consumer->consume($dto);
+        $context = new ConsumingContext();
+
+        $consumer->consume($dto, $context);
     }
 }

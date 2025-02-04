@@ -4,10 +4,9 @@ queues:
       - App\Consumer\GameOperationConsumer
 
 queue_coroutines_amount: 2
-  
-firewalls:
 
-  game_user_firewall:
+firewalls:
+  game_operation_firewall:
     class: App\Firewall\GameOperationFirewall
     consumers:
       - App\Consumer\GameOperationConsumer

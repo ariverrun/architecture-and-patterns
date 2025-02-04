@@ -47,7 +47,7 @@ class InitExampleGamesCommand implements CommandInterface
                 $objectsPool->set($objectId, $object);
             }
 
-            IoC::resolve('Game.ObjectsPool.Set', $gameId)($objectsPool);
+            IoC::resolve('Game.ObjectsPool.Set', $gameId, 0)($objectsPool);
         }
     }
 }

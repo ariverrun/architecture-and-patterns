@@ -56,10 +56,10 @@ class AMQPApplication implements ApplicationInterface
 
         Assert::allIsArray($appConfig['queues']);
 
-        $this->queuesConfig = $appConfig['firewalls'];
+        $this->queuesConfig = $appConfig['queues'];
 
         if (!array_key_exists('firewalls', $appConfig)) {
-            throw new InvalidConfigurationException("Missing required configuration parameter 'queuefirewallss'");
+            throw new InvalidConfigurationException("Missing required configuration parameter 'firewalls'");
         }
 
         Assert::allIsArray($appConfig['firewalls']);
