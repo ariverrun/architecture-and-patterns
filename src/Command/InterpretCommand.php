@@ -13,7 +13,7 @@ class InterpretCommand implements CommandInterface
 {
     public function __construct(
         private readonly string $operationId,
-        private readonly ObjectWithPropertiesContainerInterface $obj,
+        private readonly ?ObjectWithPropertiesContainerInterface $obj,
         private readonly mixed $args,
         private readonly CommandQueueInterface $queue,
     ) {

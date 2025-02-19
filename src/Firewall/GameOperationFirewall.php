@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Firewall;
 
+use App\AMQP\Consumer\ConsumingContext;
 use App\AMQP\Firewall\FirewallInterface;
 use App\DependencyInjection\IoC;
 use App\Consumer\GameOperationMessageDto;
@@ -26,7 +27,7 @@ class GameOperationFirewall implements FirewallInterface
     /**
      * @param GameOperationMessageDto $consumerArg
      */
-    public function isAccessGranted(AMQPMessage $aMQPMessage, mixed $consumerArg): bool
+    public function isAccessGranted(AMQPMessage $aMQPMessage, mixed $consumerArg, ConsumingContext $context): bool
     {
         $headers = $aMQPMessage->get_properties()['application_headers'] ?? [];
 
@@ -49,6 +50,10 @@ class GameOperationFirewall implements FirewallInterface
         if ($gameSessionId <= 0 || $gameSessionId !== $this->gameRepository->getSessionIdByGameId($consumerArg->gameId)) {
             return false;
         }
+
+        $userId = isset($payload['userId']) ? (int)$payload['userId'] : 0;
+
+        $context->setUserId($userId);
 
         return true;
     }
